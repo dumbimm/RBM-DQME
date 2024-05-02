@@ -1,0 +1,12 @@
+
+'''
+   In each folder named 'T=0.x' there is a file named 'job.sh', 
+  Run the following code in this folder in turn :
+      chmod +x job.sh
+      nohup sh job.sh &
+
+    If you only want to solve steady state, Comment out the code about Evolution.
+
+    There are two ways to run both Solving steady state and Evolution:
+  choose one of each as wanted and comment out the other.
+'''

@@ -1,0 +1,5 @@
+case2  cuda        
+60 20 0     # N-hidden  N-auxillary 
+2 3 0       # nonmc-cut  all-cut (if nonmc, nonmc-cut=all-cut=3; if mc, nonmc-cut+1=all-cut=3)
+4 2000 4500     # chains_number  N_start N_end
+0.0 0       # (for td) t_initial  count_initial
