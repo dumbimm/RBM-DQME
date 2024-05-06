@@ -134,19 +134,23 @@ while result_rk.t < t_upper :
     count += 1
 
     print('here print the real step of t')
-    t0 = time.time()
-    rho_0 = rho.rho_0().detach()
-    trace_rho0 = torch.real(torch.trace(rho_0))
+    f1 = open('t-step','a')
+    f1.write(f'{get_last_line("t-n_all").decode()}')
+    f1.write(f'    {fun.count_in_fun-1:5d}\n')
+    f1.flush()
+    f1.close()
 
     if count%20==0 and count!=0 :
-        ldaggl_final = float(get_last_line('t-step').decode().split(' ')[-1])<8e-7 
+        ldaggl_final = float(get_last_line('t-n_all').decode().split(' ')[-1])
         if (ldaggl_final<8e-7 and case=='case1') or (ldaggl_final<9e-6 and case=='case2') :
             torch.save(rho.state_dict(),'para_steady_state')
             print(f'here generate para_steady_state, count={count:d}')
-            print('Successful')
-            sys_sys.exit()
+            break
         torch.save(rho.state_dict(),'para'+str(count))
         print(f'here generate para{count:d}')
 
 if not os.path.exists('para_steady_state') : 
     print('Not successful, please run again.')
+else :
+    print('Successful.')
+
