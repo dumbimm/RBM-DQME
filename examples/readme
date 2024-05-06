@@ -10,3 +10,10 @@
     There are two ways to run both Solving steady state and Evolution:
   choose one of each as wanted and comment out the other.
 '''
+'''
+   Print in t-step:
+   If case1, 
+      time n_up n_down trace   deltas2 |L\rho|^2   j_left j_right j_tot
+   If case2, 
+      time n_up n_down trace   deltas2 |L\rho|^2   S12 Sx2 Sy2 Sz2   S_vN   E_hyb
+'''
