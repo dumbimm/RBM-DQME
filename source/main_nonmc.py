@@ -147,33 +147,41 @@ while result_rk.t < t_upper :
     print(I)
     f1.write(f'{get_last_line("t-n_all").decode()}')
     f1.write('      ')
-    if rho.Nb == 1 : 
-        f1.write(f'{torch.real(I[0][0]).item(): .5e}  {torch.real(I[1][0]).item(): .5e}  {torch.real(I_tot[0]).item(): .5e}')
-    else : 
-        I_tot = torch.cat((Ib,I_tot))
-        for i in range(rho.Nb+1) : 
-            f1.write(f'{torch.real(I_tot[i]).item(): .5e}  ')
-    if rho.Nv>1 :
-        S12, Sx2, Sy2, Sz2 = operator_print.spin_ddot(rho_0)
-        f1.write('      ')
-        f1.write(f'{S12: .5e}   {Sx2:.5e}  {Sy2:.5e}  {Sz2:.5e}')
+    if case=='case1' :
+        if rho.Nb == 1 : 
+            f1.write(f'{torch.real(I[0][0]).item(): .5e}  {torch.real(I[1][0]).item(): .5e}  {torch.real(I_tot[0]).item(): .5e}')
+        else : 
+            I_tot = torch.cat((Ib,I_tot))
+            for i in range(rho.Nb+1) : 
+                f1.write(f'{torch.real(I_tot[i]).item(): .5e}  ')
+    elif case=='case2' :
+        if rho.Nv>1 :
+            S12, Sx2, Sy2, Sz2 = operator_print.spin_ddot(rho_0)
+            f1.write('      ')
+            f1.write(f'{S12: .5e}   {Sx2:.5e}   {Sy2:.5e}   {Sz2:.5e}')
+            S_vN = operator_print.S_vN(rho_0)
+            f1.write('      ')
+            f1.write(f'{S_vN: .5e}')
+            E_hyb = operator_print.E_SE(rho,rho_0)
+            f1.write('      ')
+            f1.write(f'{E_hyb: .5e}')
     f1.write(f'    {fun.count_in_fun-1:5d}\n')
     f1.flush()
     f1.close()
     t1 = time.time()
     print(f'timeI: {t1-t0:.3e}')
 
-    if case=='case2' :
-        rho0 = rho_0/torch.trace(rho_0)
-        f2 = open('rho0_elements','a')
-        f2.write(f'{result_rk.t:.6f}  ')
-        for j in range(rho_0.shape[0]):
-            f2.write(f'{torch.real(rho0[j][j]):.6e}  ')
-        f2.write(f'  {torch.real(rho0[6][9]):.6e}  {torch.real(rho0[9][6]):.6e}  ')
-        f2.write(f'  {torch.imag(rho0[6][9]):.6e}  {torch.imag(rho0[9][6]):.6e}  ')
-        f2.write(f'{torch.real(torch.trace(rho_0)):.3e}\n')
-        f2.flush()
-        f2.close()
+    # if case=='case2' :
+    #     rho0 = rho_0/torch.trace(rho_0)
+    #     f2 = open('rho0_elements','a')
+    #     f2.write(f'{result_rk.t:.6f}  ')
+    #     for j in range(rho_0.shape[0]):
+    #         f2.write(f'{torch.real(rho0[j][j]):.6e}  ')
+    #     f2.write(f'  {torch.real(rho0[6][9]):.6e}  {torch.real(rho0[9][6]):.6e}  ')
+    #     f2.write(f'  {torch.imag(rho0[6][9]):.6e}  {torch.imag(rho0[9][6]):.6e}  ')
+    #     f2.write(f'{torch.real(torch.trace(rho_0)):.3e}\n')
+    #     f2.flush()
+    #     f2.close()
 
     if count%20==0 and count!=0 :
         torch.save(rho.state_dict(),'para'+str(count))
