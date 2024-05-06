@@ -14,6 +14,8 @@ class operator_print() :
         nrho = sys.nrho
         self.device = states.device
         c_vo = torch.tensor(sys.c,dtype=torch.complex128,device=self.device)
+        self.H_S = torch.tensor(sys.Hsys.toarray(),dtype=torch.complex128,device=self.device)
+
 
         self.occu_up = torch.zeros((nrho,nrho),dtype=torch.complex128,device=self.device)
         self.occu_down = torch.zeros((nrho,nrho),dtype=torch.complex128,device=self.device)
@@ -35,13 +37,16 @@ class operator_print() :
         self.ado1_posi2[1] = SubscriptTrans0_torch(x1_)
         self.ado1_posi2[2] = SubscriptTrans0_torch(x2_)
         self.c_ov_I = torch.zeros((Nd,nrho,nrho),dtype=torch.complex128,device=self.device)
+        self.c_ov_E = torch.zeros((Nd,nrho,nrho),dtype=torch.complex128,device=self.device)
         for i in range(Nd//2) : 
             count_ov = (i%(Nd//2))//(Nb*M)
             count_vo = No*(count_ov%Nv)+count_ov//Nv
             c_v = c_vo[count_vo*nrho:(count_vo+1)*nrho,:]
-            self.c_ov_I[i+Nd//2,:,:] = c_v
-            self.c_ov_I[i,:,:] = -self.c_ov_I[i+Nd//2,:,:].T
-        
+            self.c_ov_I[i+Nd//2,:,:] = c_ov
+            self.c_ov_I[i,:,:] = -c_ov.T
+            self.c_ov_E[i+Nd//2,:,:] = c_ov
+            self.c_ov_E[i,:,:] = c_ov.T
+
         self.pauli = torch.zeros((3,2,2),dtype=torch.complex128,device=self.device)
         self.pauli[0] = torch.tensor([[0,0.5],[0.5,0]])
         self.pauli[1] = torch.tensor([[0,0.5j],[-0.5j,0]])
@@ -89,4 +94,19 @@ class operator_print() :
         Sz2 = torch.trace(((self.S_xyz[2]).matmul(self.S_xyz[2])).matmul(rho_0)).detach()
         return torch.real(S12), torch.real(Sx2), torch.real(Sy2), torch.real(Sz2)
 
+    def E_SE(self,rho,rho_0) :
+        ado1 = torch.zeros((rho.Nd,2**rho.Ns,2**rho.Ns),dtype=torch.complex128,device=self.device)
+        rho_states_ado1 = rho.States(self.states_ado1)
+        posi2 = self.ado1_posi2
+        for i in range(len(self.ado1_posi1)) : 
+            ado1[posi2[0,i],posi2[1,i],posi2[2,i]] = rho_states_ado1[i]
+
+        c_ado1 = self.c_ov_E.matmul(ado1)
+        E_SB = torch.zeros(1,dtype=torch.complex128,device=self.device)
+        for i in range(c_ado1.shape[0]) : 
+            E_SB += torch.trace(c_ado1[i,:,:])
+        return E_SB/torch.trace(rho_0)
+
+    def E_S(self,rho_0) :
+        return torch.trace(self.H_S.matmul(rho_0))/torch.trace(rho_0)
 
