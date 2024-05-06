@@ -126,9 +126,8 @@ class fun() :
 
         a = np.exp(lmbda)
         sum_weight = 0
-        num_case2_M4 = 30466-3842
         for i in range(self.mc_cut+1,self.all_cut+1):
-            sum_weight += num_case2_M4*a**i
+            sum_weight += 50*rho.Nv**3*rho.Nb*rho.M**3*a**i
         S = S_0 + S_mc*sum_weight
         F = F_0 + F_mc*sum_weight
         L2 = L2_0 + L2_mc*sum_weight
