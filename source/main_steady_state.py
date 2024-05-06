@@ -91,7 +91,7 @@ class fun() :
             g0 = g.to('cpu').numpy()
         else :
             S0,F0 = S.numpy(),F.numpy()
-            g0 = MinresQLP(S0,F0,50*pow(10,-13),10000)[0]
+            g0 = MinresQLP(S0,F0,50*pow(10,-13),30000)[0]
             g = torch.tensor(g0,dtype=torch.float64,device=device)
         t3 = time.time()
 
@@ -138,7 +138,7 @@ while result_rk.t < t_upper :
     rho_0 = rho.rho_0().detach()
     trace_rho0 = torch.real(torch.trace(rho_0))
 
-    if count%50==0 and count!=0 :
+    if count%20==0 and count!=0 :
         ldaggl_final = float(get_last_line('t-step').decode().split(' ')[-1])<8e-7 
         if (ldaggl_final<8e-7 and case=='case1') or (ldaggl_final<9e-6 and case=='case2') :
             torch.save(rho.state_dict(),'para_steady_state')
