@@ -2,6 +2,7 @@ import torch
 import numpy as np
 import time
 from hamsys64 import SubscriptTrans0_torch
+import scipy.linalg 
 
 
 
@@ -93,6 +94,11 @@ class operator_print() :
         Sy2 = torch.trace(((self.S_xyz[1]).matmul(self.S_xyz[1])).matmul(rho_0)).detach()
         Sz2 = torch.trace(((self.S_xyz[2]).matmul(self.S_xyz[2])).matmul(rho_0)).detach()
         return torch.real(S12), torch.real(Sx2), torch.real(Sy2), torch.real(Sz2)
+
+    def S_vN(self,rho_0) :
+        rho_0 = rho_0/torch.trace(rho_0)
+        log_rho0 = torch.tensor(scipy.linalg.logm(rho_0.to('cpu').numpy()),device=self.device)
+        return -torch.real(torch.trace(torch.matmul(rho_0,log_rho0)))
 
     def E_SE(self,rho,rho_0) :
         ado1 = torch.zeros((rho.Nd,2**rho.Ns,2**rho.Ns),dtype=torch.complex128,device=self.device)
