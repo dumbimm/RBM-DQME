@@ -18,7 +18,7 @@ class Chainsampler():
             self.allcut = cut2
 
     def sampling(self,rho):
-        device = rho.bh.device
+        device = rho.device
         if self.rule == 'exact' :
             self.table = self.table.to(device)
             return self.table
@@ -35,7 +35,7 @@ class Chainsampler():
                     Statenow = self.flip(Statenow,rho)
                     if i >= self.start :
                         chain[j,i-self.start] = Statenow
-            return chain.to(rho.bh.device)
+            return chain.to(rho.device)
 
     def flip(self,statenow,rho) :
             n = rho.Nd
