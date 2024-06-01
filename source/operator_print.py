@@ -14,9 +14,8 @@ class operator_print() :
         Ns = No * Nv
         nrho = sys.nrho
         self.device = states.device
-        c_vo = torch.tensor(sys.c,dtype=torch.complex128,device=self.device)
         self.H_S = torch.tensor(sys.Hsys.toarray(),dtype=torch.complex128,device=self.device)
-
+        c_vo = torch.tensor(sys.c,dtype=torch.complex128,device=self.device)
 
         self.occu_up = torch.zeros((nrho,nrho),dtype=torch.complex128,device=self.device)
         self.occu_down = torch.zeros((nrho,nrho),dtype=torch.complex128,device=self.device)
@@ -42,12 +41,12 @@ class operator_print() :
         for i in range(Nd//2) : 
             count_ov = (i%(Nd//2))//(Nb*M)
             count_vo = No*(count_ov%Nv)+count_ov//Nv
-            c_v = c_vo[count_vo*nrho:(count_vo+1)*nrho,:]
+            c_ov = c_vo[count_vo*nrho:(count_vo+1)*nrho,:]
             self.c_ov_I[i+Nd//2,:,:] = c_ov
             self.c_ov_I[i,:,:] = -c_ov.T
             self.c_ov_E[i+Nd//2,:,:] = c_ov
             self.c_ov_E[i,:,:] = c_ov.T
-
+        
         self.pauli = torch.zeros((3,2,2),dtype=torch.complex128,device=self.device)
         self.pauli[0] = torch.tensor([[0,0.5],[0.5,0]])
         self.pauli[1] = torch.tensor([[0,0.5j],[-0.5j,0]])
@@ -111,8 +110,8 @@ class operator_print() :
         E_SB = torch.zeros(1,dtype=torch.complex128,device=self.device)
         for i in range(c_ado1.shape[0]) : 
             E_SB += torch.trace(c_ado1[i,:,:])
-        return E_SB/torch.trace(rho_0)
+        return torch.real(E_SB.item()/torch.trace(rho_0))
 
     def E_S(self,rho_0) :
-        return torch.trace(self.H_S.matmul(rho_0))/torch.trace(rho_0)
+        return torch.real(torch.trace(self.H_S.matmul(rho_0))/torch.trace(rho_0))
 
